@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinTrack – Personal Finance Manager | Mahmoud Salah</title>
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<!-- Theme Toggle -->
+<label class="theme-toggle">
+    <input type="checkbox" id="themeSwitch">
+    <span class="slider"></span>
+</label>
+
+<!-- Currency Switcher -->
+<div class="currency-switcher">
+    <select id="currencySelect">
+        <option value="$">USD ($)</option>
+        <option value="€">EUR (€)</option>
+        <option value="£">GBP (£)</option>
+        <option value="EGP">EGP (ج.م)</option>
+    </select>
+</div>
+
+<!-- Lock Screen -->
+<div id="lockScreen" class="lock-screen">
+    <div class="lock-card">
+        <h2>Welcome back</h2>
+        <input id="pinInput" type="password" inputmode="numeric" maxlength="4" placeholder="4-digit PIN">
+        <button class="btn primary" onclick="unlock()">Unlock</button>
+        <p class="error"></p>
+    </div>
+</div>
+
+<!-- Hamburger -->
+<button id="hamburger" class="hamburger" aria-label="Menu">☰</button>
+
+<!-- Drawer -->
+<aside id="drawer" class="drawer">
+    <ul class="drawer-links">
+        <li><a href="#" data-page="dashboard" class="active">📊 Dashboard</a></li>
+        <li><a href="#" data-page="transactions">🧾 Transactions</a></li>
+        <li><a href="#" data-page="budgets">🎯 Budgets</a></li>
+        <li><a href="#" data-page="profile">👤 Profile</a></li>
+    </ul>
+</aside>
+<div id="drawerOverlay" class="drawer-overlay"></div>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="container nav-wrapper">
+        <a href="#" class="brand">💰 FinTrack</a>
+        <ul class="nav-links">
+            <li><a href="#" data-page="dashboard" class="active">Dashboard</a></li>
+            <li><a href="#" data-page="transactions">Transactions</a></li>
+            <li><a href="#" data-page="budgets">Budgets</a></li>
+            <li><a href="#" data-page="profile">Profile</a></li>
+        </ul>
+    </div>
+</nav>
+
+<!-- Main Content -->
+<main class="container main-content">
+    <!-- Dashboard -->
+    <section id="dashboard" class="page">
+        <h1 class="page-title">Dashboard</h1>
+        <div class="stat-grid">
+            <div class="stat-card income">
+                <h2>Total Income</h2>
+                <p class="amount" data-value="0"><span class="currency-symbol">$</span>0</p>
+            </div>
+            <div class="stat-card expense">
+                <h2>Total Expenses</h2>
+                <p class="amount" data-value="0"><span class="currency-symbol">$</span>0</p>
+            </div>
+            <div class="stat-card balance">
+                <h2>Balance</h2>
+                <p class="amount" data-value="0"><span class="currency-symbol">$</span>0</p>
+            </div>
+        </div>
+        <div class="chart-wrapper">
+            <canvas id="spendingChart"></canvas>
+        </div>
+    </section>
+
+    <!-- Transactions -->
+    <section id="transactions" class="page hidden">
+        <h1 class="page-title">Transactions</h1>
+        <div class="toolbar">
+            <button id="addTxBtn" class="btn primary">+ Add Transaction</button>
+            <button id="exportCsvBtn" class="btn secondary">Export CSV</button>
+            <select id="categoryFilter" class="filter">
+                <option value="all">All Categories</option>
+            </select>
+        </div>
+        <div class="table-wrapper">
+            <table id="txTable">
+                <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Category</th>
+                    <th>Amount</th>
+                    <th>Notes</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Budgets -->
+    <section id="budgets" class="page hidden">
+        <h1 class="page-title">Monthly Budgets</h1>
+        <div class="toolbar">
+            <button id="addBudgetBtn" class="btn primary">+ Set Budget</button>
+        </div>
+        <div id="budgetList" class="budget-grid"></div>
+    </section>
+
+    <!-- Profile -->
+    <section id="profile" class="page hidden">
+        <h1 class="page-title">Profile</h1>
+        <div class="profile-card">
+            <img src="/img/vecteezy_man-empty-avatar-vector-photo-placeholder-for-social_36594092.jpg" alt="Avatar" class="avatar" width="150" height="150">
+            <h2>Mahmoud Salah</h2>
+            <p>Full-Stack Developer & Product Designer</p>
+            <p>Building FinTrack to help people manage money smarter.</p>
+        </div>
+    </section>
+</main>
+
+<!-- Transaction Modal -->
+<div id="txModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Add Transaction</h2>
+        <form id="txForm">
+            <label>
+                Type
+                <select name="type" required>
+                    <option value="income">Income</option>
+                    <option value="expense">Expense</option>
+                </select>
+            </label>
+            <label>
+                Category
+                <select name="category" required></select>
+            </label>
+            <label>
+                Amount
+                <input type="number" name="amount" step="0.01" required>
+            </label>
+            <label>
+                Date
+                <input type="date" name="date" required>
+            </label>
+            <label>
+                Notes
+                <input type="text" name="notes" placeholder="Optional">
+            </label>
+            <label class="recurrent-box">
+                <input type="checkbox" name="recurrent"> Repeat monthly
+            </label>
+            <button type="submit" class="btn primary">Save</button>
+        </form>
+    </div>
+</div>
+
+<!-- Budget Modal -->
+<div id="budgetModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Set Monthly Budget</h2>
+        <form id="budgetForm">
+            <label>
+                Category
+                <select name="category" required></select>
+            </label>
+            <label>
+                Cap Amount
+                <input type="number" name="cap" step="0.01" required>
+            </label>
+            <button type="submit" class="btn primary">Save</button>
+        </form>
+    </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
