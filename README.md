@@ -1,6 +1,6 @@
 
 <h1 align="center">
-  <img src="icons/icon-192.png" width="60" alt="logo">
+  <img src="icon-192.png" width="60" alt="logo">
   <br>
   FinTrack – Personal Finance Manager
   <br>
