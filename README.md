@@ -81,13 +81,9 @@
 - [ ] Recurring budgets (weekly / yearly)
 - [ ] QR-code export
 
-## 🤝 Contributing
-Please read [CONTRIBUTING.md](./CONTRIBUTING.md) before opening a PR.
-
-## 📜 License
-MIT © [Mahmoud Salah](./LICENSE)
 
 ## 🙏 Acknowledgements
 - [Chart.js](https://chartjs.org)
 - [driver.js](https://driverjs.com)
+
 - [Inter font](https://rsms.me/inter)
