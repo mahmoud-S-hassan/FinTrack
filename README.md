@@ -11,7 +11,6 @@
   <a href="#demo">Demo</a> •
   <a href="#install">Install</a> •
   <a href="#tech">Tech</a> •
-  <a href="#license">License</a>
 </p>
 
 <p align="center">
@@ -87,3 +86,4 @@
 - [driver.js](https://driverjs.com)
 
 - [Inter font](https://rsms.me/inter)
+
