@@ -142,7 +142,7 @@ function renderTable(filter = 'all') {
     txBody.innerHTML = '';
     const rows = (filter === 'all' ? transactions : transactions.filter(t => t.category === filter))
         .sort((a, b) => new Date(b.date) - new Date(a.date));
-    rows.forEach(tx => {
+    rows.forEach((tx, index) => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>${tx.date}</td>
@@ -150,10 +150,18 @@ function renderTable(filter = 'all') {
             <td>${tx.category}</td>
             <td>${currencySymbol}${tx.amount.toFixed(2)}</td>
             <td>${tx.notes}</td>
+            <td><button class="btn danger" onclick="removeTransaction(${index})">Remove</button></td>
         `;
         txBody.appendChild(tr);
     });
     populateFilter();
+}
+function removeTransaction(index) {
+    transactions.splice(index, 1);
+    localStorage.setItem('fintrack', JSON.stringify(transactions));
+    renderTable();
+    renderDashboard();
+    renderBudgets();
 }
 function populateFilter() {
     const opts = ['all', ...new Set(transactions.map(t => t.category))];
@@ -228,10 +236,16 @@ function renderBudgets() {
 
 /* ---------- Lock ---------- */
 const PIN = localStorage.getItem('fintrack-pin') || '0000';
+pinInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+        unlock();
+    }
+});
 function unlock() {
     if (pinInput.value === PIN) {
         lockScreen.style.display = 'none';
         document.body.style.overflow = '';
+        renderDashboard();
     } else {
         document.querySelector('.lock-screen .error').textContent = 'Wrong PIN';
         pinInput.value = '';
